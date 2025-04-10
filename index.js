@@ -49,7 +49,6 @@
 
 
 
-// index.js
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
@@ -60,61 +59,46 @@ const app = express();
 app.use(cors());
 app.use(bodyParser.json());
 
-// ✅ Connect to MongoDB
-mongoose.connect("mongodb+srv://neeshu:YC7pQ0Unf32NKHi7@neeshu.cwxzomm.mongodb.net/UserData?retryWrites=true&w=majority&appName=neeshu", {
+// Connect to MongoDB
+mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
-  useUnifiedTopology: true,
+  useUnifiedTopology: true
 })
-.then(() => console.log('✅ MongoDB connected'))
-.catch((err) => console.error('❌ MongoDB error:', err));
+.then(() => console.log("MongoDB connected"))
+.catch(err => console.error("MongoDB connection error:", err));
 
-// ✅ Schema & Model
+// Schema
 const PlayerSchema = new mongoose.Schema({
   name: String,
   email: String,
   phone: String,
   score: Number,
 });
-const Player = mongoose.model('Player', PlayerSchema);
+const Player = mongoose.model("Player", PlayerSchema);
 
-//
-// ✅ Route 1: Register user (without score)
-//
-app.post('/register', async (req, res) => {
+// Save user details (real-time)
+app.post("/register", async (req, res) => {
   const { name, email, phone } = req.body;
   try {
-    const newPlayer = new Player({ name, email, phone });
-    const savedPlayer = await newPlayer.save();
-    res.json({ message: 'User registered', id: savedPlayer._id });
+    const newUser = new Player({ name, email, phone, score: 0 });
+    await newUser.save();
+    res.json({ message: "User registered", id: newUser._id });
   } catch (err) {
-    console.error('Error registering user:', err);
-    res.status(500).json({ error: 'Error registering user' });
+    res.status(500).json({ error: "User registration failed" });
   }
 });
 
-//
-// ✅ Route 2: Save/Update score later using ID
-//
-app.post('/save-score', async (req, res) => {
+// Save score later using same ID
+app.post("/save-score", async (req, res) => {
   const { id, score } = req.body;
   try {
-    const updatedPlayer = await Player.findByIdAndUpdate(
-      id,
-      { $set: { score } },
-      { new: true }
-    );
-    if (!updatedPlayer) {
-      return res.status(404).json({ error: 'User not found' });
-    }
-    res.json({ message: 'Score updated', player: updatedPlayer });
+    await Player.findByIdAndUpdate(id, { $set: { score } });
+    res.json({ message: "Score saved" });
   } catch (err) {
-    console.error('Error updating score:', err);
-    res.status(500).json({ error: 'Error updating score' });
+    res.status(500).json({ error: "Failed to update score" });
   }
 });
 
-// ✅ Start server
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`🚀 Server running on port ${PORT}`);
+app.listen(3000, () => {
+  console.log("Server running on port 3000");
 });
