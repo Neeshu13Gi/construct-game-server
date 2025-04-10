@@ -29,16 +29,23 @@ const Player = mongoose.model('Player', PlayerSchema);
 
 // Endpoint
 app.post('/submit', async (req, res) => {
-    console.log('Received data:', req.body);
+  console.log('Received data:', req.body); // <-- already added, good!
   const { name, email, phone, score } = req.body;
+
+  if (!name || !email || !phone) {
+      console.warn('Missing user details:', { name, email, phone });
+  }
+
   try {
-    const newPlayer = new Player({ name, email, phone, score });
-    await newPlayer.save();
-    res.json({ message: 'Data saved!' });
+      const newPlayer = new Player({ name, email, phone, score });
+      await newPlayer.save();
+      res.json({ message: 'Data saved!' });
   } catch (err) {
-    res.status(500).json({ error: 'Error saving data' });
+      console.error('Error saving:', err);
+      res.status(500).json({ error: 'Error saving data' });
   }
 });
+
 
 // Start server
 const PORT = process.env.PORT || 3000;
