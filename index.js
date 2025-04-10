@@ -1,4 +1,6 @@
+
 // index.js
+require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
@@ -9,21 +11,23 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // MongoDB connection
-mongoose.connect('mongodb://localhost:27017/gameDB', {
+mongoose.connect("mongodb+srv://neeshu:YC7pQ0Unf32NKHi7@neeshu.cwxzomm.mongodb.net/UserData?retryWrites=true&w=majority&appName=neeshu", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-});
+})
+.then(() => console.log('MongoDB connected'))
+.catch((err) => console.error('MongoDB error:', err));
 
+// Schema
 const PlayerSchema = new mongoose.Schema({
   name: String,
   email: String,
   phone: String,
   score: Number,
 });
-
 const Player = mongoose.model('Player', PlayerSchema);
 
-// API endpoint
+// Endpoint
 app.post('/submit', async (req, res) => {
   const { name, email, phone, score } = req.body;
   try {
@@ -35,6 +39,8 @@ app.post('/submit', async (req, res) => {
   }
 });
 
-app.listen(3000, () => {
-  console.log('Server running on port 3000');
+// Start server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
