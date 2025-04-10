@@ -29,6 +29,7 @@ const Player = mongoose.model('Player', PlayerSchema);
 
 // Endpoint
 app.post('/submit', async (req, res) => {
+    console.log('Received data:', req.body);
   const { name, email, phone, score } = req.body;
   try {
     const newPlayer = new Player({ name, email, phone, score });
