@@ -61,7 +61,7 @@ app.use(cors());
 app.use(bodyParser.json());
 
 // ✅ Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI, {
+mongoose.connect("mongodb+srv://neeshu:YC7pQ0Unf32NKHi7@neeshu.cwxzomm.mongodb.net/UserData?retryWrites=true&w=majority&appName=neeshu", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 })
