@@ -39,20 +39,17 @@ app.post('/submit', async (req, res) => {
 });
 
 // ✅ Endpoint 2: Update score using _id later
-app.post('/save-score', async (req, res) => {
-  console.log('Updating score:', req.body);
+app.patch("/save-score", async (req, res) => {
   const { id, score } = req.body;
+
   try {
-    const updated = await Player.findByIdAndUpdate(id, { $set: { score } }, { new: true });
-    if (updated) {
-      res.json({ message: 'Score updated successfully', updated });
-    } else {
-      res.status(404).json({ error: 'User not found' });
-    }
+    const updated = await User.findByIdAndUpdate(id, { score }, { new: true });
+    res.json(updated);
   } catch (err) {
-    res.status(500).json({ error: 'Failed to update score' });
+    res.status(500).json({ error: err.message });
   }
 });
+
 
 // Start server
 const PORT = process.env.PORT || 3000;
