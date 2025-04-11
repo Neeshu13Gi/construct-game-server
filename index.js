@@ -47,7 +47,8 @@ app.patch("/save-score", async (req, res) => {
   }
 
   try {
-    const updated = await User.findByIdAndUpdate(id, { score }, { new: true });
+    const updated = await Player.findByIdAndUpdate(id, { score }, { new: true });
+    
 
     if (!updated) {
       return res.status(404).json({ error: "User not found" });
@@ -55,6 +56,7 @@ app.patch("/save-score", async (req, res) => {
 
     res.json({ message: "Score updated", user: updated });
   } catch (error) {
+    console.log(error)
     res.status(500).json({ error: error.message });
   }
 });
