@@ -42,11 +42,20 @@ app.post('/submit', async (req, res) => {
 app.patch("/save-score", async (req, res) => {
   const { id, score } = req.body;
 
+  if (!id || typeof score === "undefined") {
+    return res.status(400).json({ error: "Missing id or score" });
+  }
+
   try {
     const updated = await User.findByIdAndUpdate(id, { score }, { new: true });
-    res.json(updated);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+
+    if (!updated) {
+      return res.status(404).json({ error: "User not found" });
+    }
+
+    res.json({ message: "Score updated", user: updated });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
   }
 });
 
