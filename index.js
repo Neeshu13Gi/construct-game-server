@@ -38,28 +38,60 @@ app.post('/submit', async (req, res) => {
   }
 });
 
-// ✅ Endpoint 2: Update score using _id later
-app.patch("/save-score", async (req, res) => {
-  const { id, score } = req.body;
 
-  if (!id || typeof score === "undefined") {
-    return res.status(400).json({ error: "Missing id or score" });
+
+
+
+// Endpoint: Update score using email
+app.post('/save-score', async (req, res) => {
+  const { email, score } = req.body;
+  console.log('🎯 Updating score for email:', email, 'to', score);
+
+  if (!email || typeof score === "undefined") {
+    return res.status(400).json({ error: "Missing email or score" });
   }
 
   try {
-    const updated = await Player.findByIdAndUpdate(id, { score }, { new: true });
-    
+    const updated = await Player.findOneAndUpdate(
+      { email },
+      { $set: { score } },
+      { new: true }
+    );
 
-    if (!updated) {
-      return res.status(404).json({ error: "User not found" });
+    if (updated) {
+      res.json({ message: '✅ Score updated successfully', updated });
+    } else {
+      res.status(404).json({ error: 'User with this email not found' });
     }
-
-    res.json({ message: "Score updated", user: updated });
-  } catch (error) {
-    console.log(error)
-    res.status(500).json({ error: error.message });
+  } catch (err) {
+    console.error('❌ Error updating score:', err);
+    res.status(500).json({ error: 'Failed to update score' });
   }
 });
+
+
+// ✅ Endpoint 2: Update score using _id later
+// app.patch("/save-score", async (req, res) => {
+//   const { id, score } = req.body;
+
+//   if (!id || typeof score === "undefined") {
+//     return res.status(400).json({ error: "Missing id or score" });
+//   }
+
+//   try {
+//     const updated = await Player.findByIdAndUpdate(id, { score }, { new: true });
+    
+
+//     if (!updated) {
+//       return res.status(404).json({ error: "User not found" });
+//     }
+
+//     res.json({ message: "Score updated", user: updated });
+//   } catch (error) {
+//     console.log(error)
+//     res.status(500).json({ error: error.message });
+//   }
+// });
 
 
 // Start server
